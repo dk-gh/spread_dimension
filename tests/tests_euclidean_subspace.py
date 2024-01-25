@@ -150,6 +150,15 @@ class EuclideanSubspaceTests(unittest.TestCase):
 
         self.assertEqual((n,m), (10,1000))
 
+    def test_valid_matrix(self):
+
+        points = swiss_roll()
+
+        sr = EuclideanSubspace(points)
+
+        sr.compute_metric(2)
+
+        self.assertTrue(sr.validate_distance_matrix())
 
 if __name__=='__main__':
     unittest.main()

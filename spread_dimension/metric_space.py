@@ -34,53 +34,89 @@ class MetricSpace():
         self.distance_matrix_ = distance_matrix_
         self.partial_distance_matrix = None
 
+    def satisfies_nonnegativity(self):
+
+        if self.distance_matrix_ is None:
+            raise DistanceMatrixNotDefined
+
+        if np.any(self.distance_matrix_ < 0):
+            return False
+        else:
+            return True
+
+    def satisfies_identity(self):
+
+        if self.distance_matrix_ is None:
+            raise DistanceMatrixNotDefined
+
+        if np.any(np.diag(self.distance_matrix_) != 0):
+            return False
+
+        if np.any(self.distance_matrix_ + np.diag([1])==0):
+            return False
+
+        return True
+
+    def satisfies_symmetry(self):
+
+        if self.distance_matrix_ is None:
+            raise DistanceMatrixNotDefined
+
+        D = self.distance_matrix_
+        if np.all(D==D.T):
+            return True
+        else:
+            return False
+
+    def satisfies_triangle_inequality(self):
+
+        if self.distance_matrix_ is None:
+            raise DistanceMatrixNotDefined
+
+        R = self.distance_matrix_.copy()
+
+        N = self.number_of_points
+
+        for i in range(N-1):
+            R = np.concatenate(
+                (R[1:,:], R[[0]]),
+                axis=0
+            )
+
+            XZ = np.diag(R)
+            XYZ = np.min(
+                R+self.distance_matrix_,
+                axis=1
+            )
+
+            if np.any(XZ > XYZ):
+                return False
+
+        return True
+
     def validate_distance_matrix(self):
 
         if self.distance_matrix_ is None:
             raise DistanceMatrixNotDefined
 
-        A = self.distance_matrix_
+        n, m = self.distance_matrix_.shape
+        if n != m:
+            return False
 
-        axiom_0 = True
-        axiom_1a = True
-        axiom_1b = True
-        axiom_2 = True
-        axiom_3 = True
+        if not self.satisfies_nonnegativity():
+            return False
 
-        B = A+np.diag(np.diag(A)+1)
-        if np.any(B==0):
-            axiom_1a = False
+        if not self.satisfies_identity():
+            return False
 
-        if np.any(A<0):
-            axiom_0 = False
+        if not  self.satisfies_symmetry():
+            return False
 
-        if not (A==A.T).all():
-            axiom_2 = False
+        if not self.satisfies_triangle_inequality():
+            return False
 
-        if np.any(np.diag(A)>0):
-            axiom_1b = False
+        return True
 
-        for row in A:
-            for i, dist_i in enumerate(row[:]):
-                for j, dist_j in enumerate(row[i+1:]):
-                    k = j+i+1
-                    check = A[i,k] <= row[i] + row[k]
-
-                    if not check:
-                        axiom_3 = False
-                        break
-                if not axiom_3:
-                    break
-            if not axiom_3:
-                break
-
-        axioms = (axiom_0, axiom_1a, axiom_1b, axiom_2, axiom_3)
-        is_valid = functools.reduce(
-            lambda x,y: x and y,
-            axioms
-        )
-
-        return is_valid, axioms
 
     @property
     def number_of_points(self):

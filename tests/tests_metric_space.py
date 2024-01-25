@@ -45,7 +45,7 @@ class Tests(unittest.TestCase):
         )
 
         validated = ms.validate_distance_matrix()
-        self.assertTrue(validated[0])
+        self.assertTrue(validated)
 
     def test_spread(self):
 
@@ -218,9 +218,12 @@ class Tests(unittest.TestCase):
 
         dist_mat = DM
         ms = MetricSpace(dist_mat)
+
+        triang = ms.satisfies_triangle_inequality()
+        self.assertFalse(triang)
+
         validated = ms.validate_distance_matrix()
-        self.assertFalse(validated[0])
-        self.assertFalse(validated[1][4])
+        self.assertFalse(validated)
 
     def test_validate_distance_matrix_not_def(self):
 

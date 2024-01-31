@@ -185,18 +185,15 @@ class Tests(unittest.TestCase):
         ms = MetricSpace(dist_mat)
         ms.select_partial_submatrix([0,3,5,8])
         pseudo_spread = ms.pseudo_spread(2)
-
         pseudo_spread = ms.pseudo_spread(1)
-
         self.assertEqual(
             ms.partial_distance_matrix.shape,
             (4,10)
         )
         self.assertAlmostEqual(
-            np.sum(pseudo_spread),
-            1.042057588075496
+            pseudo_spread,
+            2.60514397018874
         )
-
 
     def test_pseudo_spread_dimension(self):
         dist_mat = DM
@@ -225,11 +222,100 @@ class Tests(unittest.TestCase):
         validated = ms.validate_distance_matrix()
         self.assertFalse(validated)
 
+    def test_validate_nonnegative(self):
+        dist_mat = DM - 1
+        ms = MetricSpace(dist_mat)
+        nonneg = ms.satisfies_nonnegativity()
+        self.assertFalse(nonneg)
+
+        validated = ms.validate_distance_matrix()
+        self.assertFalse(validated)
+
+    def test_validate_nonidentity1(self):
+
+        dist_map = {
+            ('a', 'a'): 0,
+            ('a', 'b'): 1,
+            ('b', 'a'): 1,
+            ('b', 'b'): 0,
+            ('a', 'c'): 1,
+            ('c', 'a'): 1,
+            ('b', 'c'): 2,
+            ('c', 'b'): 2,
+            ('c', 'c'): 0
+        }
+
+        ms = MetricSpace.from_distance_map(dist_map)
+
+        ms.distance_matrix_[0,1] = 0
+        ident = ms.satisfies_identity()
+        self.assertFalse(ident)
+
+        validated = ms.validate_distance_matrix()
+        self.assertFalse(validated)
+
+    def test_validate_nonidentity2(self):
+
+        dist_map = {
+            ('a', 'a'): 0,
+            ('a', 'b'): 1,
+            ('b', 'a'): 1,
+            ('b', 'b'): 0,
+            ('a', 'c'): 1,
+            ('c', 'a'): 1,
+            ('b', 'c'): 2,
+            ('c', 'b'): 2,
+            ('c', 'c'): 0
+        }
+
+        ms = MetricSpace.from_distance_map(dist_map)
+
+        ms.distance_matrix_[1,1] = 1
+        ident = ms.satisfies_identity()
+        self.assertFalse(ident)
+
+        validated = ms.validate_distance_matrix()
+        self.assertFalse(validated)
+
+    def test_validate_symmetry(self):
+        dist_map = {
+            ('a', 'a'): 0,
+            ('a', 'b'): 1,
+            ('b', 'a'): 1,
+            ('b', 'b'): 0,
+            ('a', 'c'): 1,
+            ('c', 'a'): 1,
+            ('b', 'c'): 2,
+            ('c', 'b'): 2,
+            ('c', 'c'): 0
+        }
+
+        ms = MetricSpace.from_distance_map(dist_map)
+
+        ms.distance_matrix_[0,1] = 1
+        symmet = ms.satisfies_symmetry()
+        self.assertFalse(symmet)
+
+        validated = ms.validate_distance_matrix()
+        self.assertFalse(validated)
+
     def test_validate_distance_matrix_not_def(self):
 
         ms = MetricSpace()
         with self.assertRaises(DistanceMatrixNotDefined):
             validated = ms.validate_distance_matrix()
+
+    def test_pseudo_spread_coincides(self):
+
+        ms = MetricSpace(DM)
+        n = ms.number_of_points
+
+        spread = ms.spread(1)
+
+        ms.get_random_partial_submatrix(n)
+        pseudo_spread = ms.pseudo_spread(1)
+
+        self.assertAlmostEqual(spread, pseudo_spread)
 
 
 DM = np.array(
@@ -263,6 +349,6 @@ def create_distance_matrix(n):
     return C
 
 
-
 if __name__=='__main__':
     unittest.main()
+

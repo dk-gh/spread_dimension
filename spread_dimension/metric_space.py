@@ -49,10 +49,12 @@ class MetricSpace():
         if self.distance_matrix_ is None:
             raise DistanceMatrixNotDefined
 
+        N = self.number_of_points
+
         if np.any(np.diag(self.distance_matrix_) != 0):
             return False
 
-        if np.any(self.distance_matrix_ + np.diag([1])==0):
+        if np.any((self.distance_matrix_ + np.diag([1]*N))==0):
             return False
 
         return True
@@ -73,23 +75,24 @@ class MetricSpace():
         if self.distance_matrix_ is None:
             raise DistanceMatrixNotDefined
 
-        R = self.distance_matrix_.copy()
+        rotated = self.distance_matrix_.copy()
 
         N = self.number_of_points
 
         for i in range(N-1):
-            R = np.concatenate(
-                (R[1:,:], R[[0]]),
+
+            rotated = np.concatenate(
+                (rotated[1:,:], rotated[[0]]),
                 axis=0
             )
 
-            XZ = np.diag(R)
-            XYZ = np.min(
-                R+self.distance_matrix_,
+            point_distances = np.diag(rotated)
+            min_distance_sum = np.min(
+                rotated+self.distance_matrix_,
                 axis=1
             )
 
-            if np.any(XZ > XYZ):
+            if np.any(point_distances > min_distance_sum):
                 return False
 
         return True
@@ -116,7 +119,6 @@ class MetricSpace():
             return False
 
         return True
-
 
     @property
     def number_of_points(self):
@@ -162,6 +164,10 @@ class MetricSpace():
 
     @staticmethod
     def propagation_of_error(mean_X, varX, mean_Y, varY, covXY):
+
+        if mean_X*mean_Y==0:
+            return 0
+
         A = (mean_X/mean_Y)**2
         B = varX/(mean_X**2)
         C = varY/(mean_Y**2)
@@ -169,7 +175,7 @@ class MetricSpace():
         var = A*(B+C-D)
         return var
 
-    def pseudo_spread(self, t):
+    def pseudo_spread_part_eval(self, t):
 
         if self.partial_distance_matrix is None:
             raise PartialDistanceMatrixNotDefined
@@ -180,6 +186,11 @@ class MetricSpace():
         )
 
         return 1/D
+
+    def pseudo_spread(self, t):
+        part_eval = self.pseudo_spread_part_eval(t)
+        N = self.number_of_points
+        return np.mean(part_eval)*N
 
     def pseudo_spread_dimension(self, t):
         """
@@ -193,7 +204,7 @@ class MetricSpace():
 
         n, m = self.partial_distance_matrix.shape
 
-        Y = self.pseudo_spread(t)
+        Y = self.pseudo_spread_part_eval(t)
         mean_Y = np.sum(Y)/n
         varY = statistics.variance(Y, mean_Y)
 

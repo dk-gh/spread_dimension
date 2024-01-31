@@ -1,8 +1,5 @@
 # TODO List
 
-- write readme
-- fix requirements
-- write docs reference algorithms from literature (preprints)
+- write README.md
 - doc strings for each method
-- setup file, use https://github.com/kennethreitz/setup.py
 

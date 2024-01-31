@@ -1,7 +1,6 @@
 import numpy as np
 from spread_dimension import EuclideanSubspace
 
-from spread_dimension.exceptions_metric_space import *
 from spread_dimension.exceptions_euclidean_subspace import *
 
 import unittest
@@ -160,5 +159,7 @@ class EuclideanSubspaceTests(unittest.TestCase):
 
         self.assertTrue(sr.validate_distance_matrix())
 
+
 if __name__=='__main__':
     unittest.main()
+

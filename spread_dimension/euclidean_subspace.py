@@ -95,3 +95,53 @@ class EuclideanSubspace(MetricSpace):
             p_norm=p_norm
         )
 
+    def find_operative_range(self, initial_scale=1, sample_size=10):
+        
+        if self.distance_matrix_:
+            self.get_random_partial_submatrix(sample_size)
+
+        else:
+            self.compute_random_partial_matrix(sample_size)
+
+        N = self.number_of_points
+
+        lower_interval_bound = 0.95*N
+        upper_interval_bound = 0.97*N
+
+        if lower_interval_bound==upper_interval_bound:
+            lower_interval_bound = N-1
+            upper_interval_bound = N
+
+        track_scales = []
+        t = initial_scale
+        prev_t = 0
+
+        while True:
+
+            track_scales.append(t)
+            current_spread = self.pseudo_spread(t)
+
+            if prev_t < t:
+                if current_spread < lower_interval_bound:
+                    prev_t = t
+                    t = 2*t
+                elif current_spread >= upper_interval_bound:
+                    tmp = t
+                    t = (t+prev_t)/2
+                    prev_t = tmp
+                else:
+                    break
+
+            elif prev_t > t:
+                if current_spread <= lower_interval_bound:
+                    tmp = t
+                    t = (t+prev_t)/2
+                    prev_t = tmp
+                elif current_spread > upper_interval_bound:
+                    prev_t = t
+                    t = t/2
+                else:
+                    break
+
+        return t, track_scales
+

@@ -23,4 +23,24 @@ Installation
 
 ## Examples
 
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_swiss_roll
+ 
+from spread_dimension import EuclideanSubspace
+ 
+swiss_roll_points = make_swiss_roll(1000)[0]
+ 
+swiss_roll = EuclideanSubspace(swiss_roll_points)
 
+swiss_roll.compute_metric()
+
+T = swiss_roll.find_operative_range()
+
+X = np.linspace(0, T, 100)
+Y = [swiss_roll.spread_dimension(t) for t in X]
+
+plt.plot(X,Y)
+plt.show()
+```

@@ -193,6 +193,17 @@ class MetricSpace():
         return var
 
     def _pseudo_spread_part_eval(self, t):
+        """Partially evaluates the pseudo spread at scale t,
+        returning an array of values.
+
+        This partial method is used for computing the pseudo
+        spread and also for computing the pseudo spread
+        dimension.
+
+        The variance of this partially evaluated array is
+        needed for approximating the variance of the spread
+        dimension.
+        """
 
         if self.partial_distance_matrix is None:
             raise PartialDistanceMatrixNotDefined
@@ -205,6 +216,9 @@ class MetricSpace():
         return 1/D
 
     def pseudo_spread(self, t):
+        """Returns the pseudo spread dimension at scale t
+        """
+
         part_eval = self._pseudo_spread_part_eval(t)
         N = self.number_of_points
         return np.mean(part_eval)*N
@@ -250,12 +264,11 @@ class MetricSpace():
         return G, varG
 
     def spread_dimension(self, t):
-        """Returns the spread dimension of distance
-        matrix when scaled by a factor of t.
+        """Returns the spread dimension of distance matrix
+        when scaled by a factor of t.
 
-        This is a vectorised implementation of the
-        exact formula for spread dimension of a finite
-        metric space.
+        This is a vectorised implementation of the exact
+        formula for spread dimension of a finite metric space.
 
         Optimised using NumExpr.
         """
@@ -270,12 +283,12 @@ class MetricSpace():
 
         denomenator = np.sum(E, axis=0)**2
         ne.evaluate("D*E", out=E)
+
         return lead_factor * np.sum(np.sum(E, axis=0)/denomenator)
 
     def _spread_dimension(self, t):
-        """Returns the spread dimension of distance
-        matrix when scaled by a factor of t.
-
+        """Returns the spread dimension of distance matrix when
+        scaled by a factor of t.
 
         Implemented using numpy array operations only. This
         is primarily used for testing correctness when optimising.
@@ -329,6 +342,10 @@ class MetricSpace():
         return cls(distance_matrix_)
 
     def select_partial_submatrix(self, list_of_indices):
+        """Creates a partial distance matrix consisting of
+        rows selected from the full distance matrix, specified
+        by the list_of_indices
+        """
 
         if self.distance_matrix_ is None:
             raise DistanceMatrixNotDefined
@@ -338,13 +355,17 @@ class MetricSpace():
 
         if n > N:
             raise InvalidSampleError(
-                f'cannot sample {n} points from space with {N} points'
+                f'cannot sample {n} points from {N} points'
                 )
 
         P = self.distance_matrix_[list_of_indices, :]
         self.partial_distance_matrix = P
 
     def get_random_partial_submatrix(self, n):
+        """Creates a partial distance matrix consisting of
+        n rows selected from the full distance matrix chosen
+        at random.
+        """
 
         if self.distance_matrix_ is None:
             raise DistanceMatrixNotDefined
@@ -352,9 +373,9 @@ class MetricSpace():
         N = self.number_of_points
         if n > N:
             raise InvalidSampleError(
-                f'cannot sample {n} points from space with {N} points'
+                f'cannot sample {n} points from {N} points'
                 )
 
-        sample_indices = random.sample(range(N),n)
+        sample_indices = random.sample(range(N), n)
         self.select_partial_submatrix(sample_indices)
 

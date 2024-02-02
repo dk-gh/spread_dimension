@@ -6,6 +6,7 @@ from .metric_space import MetricSpace
 
 from .exceptions_euclidean_subspace import *
 
+
 class EuclideanSubspace(MetricSpace):
     """
     A Euclidean subspace is a subset of points of R^n
@@ -29,20 +30,22 @@ class EuclideanSubspace(MetricSpace):
 
     @property
     def number_of_points(self):
+        """This property overwrites the method inherited from
+        the MetricSpace class which is based on dimensions
+        of distance_matrix_ and/or partial_distance_matrix only
+        """
+
         return len(self.points)
 
     def compute_metric(self, p_norm=2):
-        """
-        computes the pairwise distances of all points
-        using the p-norm distance d(x,y) = ||x-y||p where
-        for x = (x1,x2,...xn)
+        """Computes the pairwise distances of all points using
+        the p-norm distance d(x,y) = ||x-y||p where for
+        x = (x1,x2,...xn)
 
         ||x||p = (|x1|^p + |x2|^p +...+|xn|^p)^(1/p)
 
-        default value is p=2 which is the standard Euclidean
+        default value is p=2, which is the standard Euclidean
         distance.
-
-        uses scipy implementation of distance_matrix for speed
         """
 
         D = scipy.spatial.distance.pdist(
@@ -53,23 +56,16 @@ class EuclideanSubspace(MetricSpace):
 
         self.distance_matrix_ = scipy.spatial.distance.squareform(D)
 
-    def compute_partial_metric(
-            self,
-            list_of_indices,
-            p_norm=2,
-            ):
-
-        """
-        computes the pairwise distances between a chosen subset of points
-        and the whole set using the p-norm distance d(x,y) = ||x-y||p where
-        for x = (x1,x2,...xn)
+    def compute_partial_metric(self, list_of_indices, p_norm=2):
+        """Computes the pairwise distances between a chosen subset
+        specified by the list of indices and the whole set using
+        the p-norm distance d(x,y) = ||x-y||p where for
+        x = (x1,x2,...xn)
 
         ||x||p = (|x1|^p + |x2|^p +...+|xn|^p)^(1/p)
 
-        default value is p=2 which is the standard Euclidean
+        The default value is p=2 which is the standard Euclidean
         distance.
-
-        uses scipy implementation of distance_matrix for speed
         """
 
         chosen_points = np.take(self.points, list_of_indices, axis=0)
@@ -81,12 +77,14 @@ class EuclideanSubspace(MetricSpace):
             )
 
     def compute_random_partial_matrix(self, n, p_norm=2):
-
+        """Computes the partial distance matrix for a random
+        sample of n points.
+        """
         N = self.number_of_points
 
         if n > N:
             raise InvalidSampleError(
-                    f'cannot sample {n} points from a space of {N} points'
+                    f'cannot sample {n} points from {N} points'
                     )
 
         random_indices = random.sample(range(N), n)
@@ -96,8 +94,34 @@ class EuclideanSubspace(MetricSpace):
         )
 
     def find_operative_range(self, initial_scale=1, sample_size=10):
-        
-        if self.distance_matrix_:
+        """The range of scale values over which the spread dimension
+        of a set of points in meaningful varies depending on the
+        nature of the space.
+
+        Eventually, for large enough scale values t, the (pseudo)
+        spread of the space tends towards the number of points in
+        the sapce.
+
+        This method iteratively computes the pseudo spread for a
+        sample of size sample_size, increasing or decreasing the
+        scale value until a value between 95% and 97% of the number
+        of points in the space is identified.
+
+        The spread dimension is defined in terms of the growth of
+        the spread, and hence we can identify the range over which
+        the growth is maximised.
+
+        This method is to be used as follows
+
+            T = self.find_operative_range()
+
+            for t in np.linspace(0,T,100):
+                self.spread_dimension(t)
+
+        The spread dimension beyond values of T will typically
+        tend towards zero.
+        """
+        if self.distance_matrix_ is not None:
             self.get_random_partial_submatrix(sample_size)
 
         else:
@@ -143,5 +167,5 @@ class EuclideanSubspace(MetricSpace):
                 else:
                     break
 
-        return t, track_scales
+        return t
 

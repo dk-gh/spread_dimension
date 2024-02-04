@@ -195,12 +195,23 @@ class Tests(unittest.TestCase):
             2.60514397018874
         )
 
+
+    def test_pseudo_spread_dimension_coincides(self):
+        dist_mat = DM
+        ms = MetricSpace(dist_mat)
+        ms.select_partial_submatrix([0,1,2,3,4,5,6,7,8,9])
+        pseudo_spread_dim = ms.pseudo_spread_dimension(2)[0]
+        pseudo_spread_dim = ms.pseudo_spread_dimension(1)[0]
+        spread_dim = ms.spread_dimension(1)
+
+        self.assertAlmostEqual(spread_dim, pseudo_spread_dim)
+
     def test_pseudo_spread_dimension(self):
         dist_mat = DM
         ms = MetricSpace(dist_mat)
         ms.select_partial_submatrix([0,3,5,8])
-        pseudo_spread_dim = ms.pseudo_spread_dimension(2)
-        pseudo_spread_dim = ms.pseudo_spread_dimension(1)
+        pseudo_spread_dim = ms.pseudo_spread_dimension(2)[0]
+        pseudo_spread_dim = ms.pseudo_spread_dimension(1)[0]
 
         self.assertEqual(
             ms.partial_distance_matrix.shape,
@@ -208,8 +219,8 @@ class Tests(unittest.TestCase):
         )
         self.assertAlmostEqual(
             np.sum(pseudo_spread_dim),
-            0.8386878673024255
-            )
+            0.8220757426879661
+        )
 
     def test_validate_distance_matrix_triang_fail(self):
 

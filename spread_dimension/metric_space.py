@@ -176,7 +176,7 @@ class MetricSpace():
         return np.sum(1/np.sum(E, axis=0))
 
     @staticmethod
-    def _propagation_of_error(mean_X, varX, mean_Y, varY, covXY):
+    def _propagation_of_error(mean_X, varX, mean_Y, varY, covXY, n):
         """Calculates the propagation of error for the pseudo
         spread dimension.
         """
@@ -190,7 +190,9 @@ class MetricSpace():
         D = 2*covXY/(mean_X*mean_Y)
         var = A*(B+C-D)
 
-        return var
+        std_error = np.sqrt(var)/np.sqrt(n)
+
+        return std_error
 
     def _pseudo_spread_part_eval(self, t):
         """Partially evaluates the pseudo spread at scale t,
@@ -253,15 +255,16 @@ class MetricSpace():
 
         G = mean_X/mean_Y
 
-        varG = MetricSpace._propagation_of_error(
+        std_error = MetricSpace._propagation_of_error(
             mean_X,
             varX,
             mean_Y,
             varY,
-            covXY
+            covXY,
+            n
         )
 
-        return G, varG
+        return G, std_error
 
     def spread_dimension(self, t):
         """Returns the spread dimension of distance matrix

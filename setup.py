@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# setup.py template copied from
 # https://github.com/navdeep-G/setup.py
 
 # Note: To use the 'upload' functionality of this file, you must:
@@ -15,14 +16,13 @@ from setuptools import find_packages, setup, Command
 
 # Package meta-data.
 NAME = 'spread_dimension'
-DESCRIPTION = 'My short description for my project.'
+DESCRIPTION = 'Computes the spread dimension of a metric space. For use as an intrinsic dimension estimator.'
 URL = 'https://github.com/dk-gh/spread_dimension'
 EMAIL = 'kevin.dunne@mailbox.org'
 AUTHOR = 'Kevin Dunne'
 REQUIRES_PYTHON = '>=3.9.0'
 VERSION = None # is read from __version__.py
 
-# What packages are required for this module to be executed?
 REQUIRED = [
     'numexpr',
     'numpy',
@@ -33,11 +33,6 @@ REQUIRED = [
 EXTRAS = {
    'tests': ['scikit-learn'],
 }
-
-# The rest you shouldn't have to touch too much :)
-# ------------------------------------------------
-# Except, perhaps the License and Trove Classifiers!
-# If you do change the License, remember to change the Trove Classifier for that!
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -85,7 +80,7 @@ class UploadCommand(Command):
             pass
 
         self.status('Building Source and Wheel (universal) distribution…')
-        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
+        os.system('{0} setup.py sdist bdist_wheel'.format(sys.executable))
 
 #        self.status('Uploading the package to PyPI via Twine…')
 #        os.system('twine upload dist/*')
@@ -123,13 +118,12 @@ setup(
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
     # $ setup.py publish support.
-    #cmdclass={
-    #    'upload': UploadCommand,
-    #},
+    cmdclass={
+        'upload': UploadCommand,
+    },
 )

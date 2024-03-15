@@ -23,6 +23,8 @@ Installation
 
 ## Examples
 
+An example computing the spread dimension of the swiss roll dataset
+
 ```
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,5 +44,42 @@ X = np.linspace(0, T, 100)
 Y = [swiss_roll.spread_dimension(t) for t in X]
 
 plt.plot(X,Y)
+plt.show()
+```
+
+An example showing 
+
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_swiss_roll
+
+from spread_dimension import EuclideanSubspace
+
+swiss_roll_points = make_swiss_roll(100_000)[0]
+
+swiss_roll = EuclideanSubspace(swiss_roll_points)
+
+# sample size N = |S|
+N = 100
+swiss_roll.compute_random_partial_matrix(N)
+
+T = np.linspace(0, 15, 200)
+
+# swiss_roll.pseudo_spread_dimension(t) returns a tuple
+#     (psd, se)
+# the pseudo spread dimension and approximated
+# standard error at scale t
+PSD_SE = [swiss_roll.pseudo_spread_dimension(t) for t in T]
+
+PSD = np.array([x[0] for x in PSD_SE])
+SE = np.array([x[1] for x in PSD_SE])
+
+PSD_CI_upper = PSD + (1.96 * SE)
+PSD_CI_low = PSD - (1.96 * SE)
+
+fig, ax = plt.subplots()
+ax.plot(T, PSD)
+ax.fill_between(T, PSD_CI_upper, PSD_CI_low, alpha=0.2)
 plt.show()
 ```

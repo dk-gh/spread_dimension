@@ -47,7 +47,7 @@ plt.plot(X,Y)
 plt.show()
 ```
 
-An example showing 
+An example of pseudo spread dimension as an approximation of spread dimension, including plotting 95% confidence intervals 
 
 ```
 import numpy as np

@@ -37,7 +37,7 @@ class EuclideanSubspace(MetricSpace):
 
         return len(self.points)
 
-    def compute_metric(self, p_norm=2):
+    def compute_metric(self, kwargs={}):
         """Computes the pairwise distances of all points using
         the p-norm distance d(x,y) = ||x-y||p where for
         x = (x1,x2,...xn)
@@ -50,13 +50,12 @@ class EuclideanSubspace(MetricSpace):
 
         D = scipy.spatial.distance.pdist(
                 self.points,
-                metric='minkowski',
-                p=p_norm
+                **kwargs
             )
 
         self.distance_matrix_ = scipy.spatial.distance.squareform(D)
 
-    def compute_partial_metric(self, list_of_indices, p_norm=2):
+    def compute_partial_metric(self, list_of_indices, kwargs={}):
         """Computes the pairwise distances between a chosen subset
         specified by the list of indices and the whole set using
         the p-norm distance d(x,y) = ||x-y||p where for
@@ -71,12 +70,12 @@ class EuclideanSubspace(MetricSpace):
         chosen_points = np.take(self.points, list_of_indices, axis=0)
 
         self.partial_distance_matrix = scipy.spatial.distance.cdist(
-                chosen_points,self.points,
-                metric='minkowski',
-                p=p_norm
+                chosen_points,
+                self.points,
+                **kwargs
             )
 
-    def compute_random_partial_matrix(self, n, p_norm=2):
+    def compute_random_partial_matrix(self, n, kwargs={}):
         """Computes the partial distance matrix for a random
         sample of n points.
         """
@@ -90,7 +89,7 @@ class EuclideanSubspace(MetricSpace):
         random_indices = random.sample(range(N), n)
         self.compute_partial_metric(
             random_indices,
-            p_norm=p_norm
+            **kwargs
         )
 
     def find_operative_range(self, initial_scale=1, sample_size=10):

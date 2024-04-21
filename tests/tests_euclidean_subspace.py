@@ -36,7 +36,7 @@ class EuclideanSubspaceTests(unittest.TestCase):
 
         sr = EuclideanSubspace(points)
 
-        sr.compute_metric(2)
+        sr.compute_metric()
 
         spread_dimension = sr.spread_dimension(0.5)
         self.assertAlmostEqual(
@@ -61,7 +61,7 @@ class EuclideanSubspaceTests(unittest.TestCase):
 
         sr = EuclideanSubspace(points)
 
-        sr.compute_metric(2)
+        sr.compute_metric()
 
         t = 0.1
         spread_dimension = sr.spread_dimension(t)
@@ -122,7 +122,7 @@ class EuclideanSubspaceTests(unittest.TestCase):
 
         self.assertEqual(n, 1000)
 
-        sr.compute_metric(2)
+        sr.compute_metric()
 
         self.assertEqual(
             (1000,1000),
@@ -155,7 +155,7 @@ class EuclideanSubspaceTests(unittest.TestCase):
 
         sr = EuclideanSubspace(points)
 
-        sr.compute_metric(2)
+        sr.compute_metric()
 
         self.assertTrue(sr.validate_distance_matrix())
 

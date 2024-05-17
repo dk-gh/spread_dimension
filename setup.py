@@ -29,11 +29,6 @@ REQUIRED = [
     'scipy'
 ]
 
-# What packages are optional?
-EXTRAS = {
-   'tests': ['scikit-learn'],
-}
-
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.

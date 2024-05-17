@@ -19,7 +19,11 @@ data <https://doi.org/10.48550/arXiv.2308.01382>
 
 ## Using spread_dimension
 
-Installation
+To install clone the repository, and install using ```pip```
+```
+pip install .
+```
+
 
 ## Examples
 

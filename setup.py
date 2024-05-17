@@ -20,7 +20,7 @@ DESCRIPTION = 'Computes the spread dimension of a metric space. For use as an in
 URL = 'https://github.com/dk-gh/spread_dimension'
 EMAIL = 'kevin.dunne@mailbox.org'
 AUTHOR = 'Kevin Dunne'
-REQUIRES_PYTHON = '>=3.9.0'
+REQUIRES_PYTHON = '>=3.10.0'
 VERSION = None # is read from __version__.py
 
 REQUIRED = [

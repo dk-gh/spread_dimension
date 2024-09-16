@@ -17,6 +17,9 @@ Cafe blog post:
 Spread dimension can be used to estimate the intrinsic dimension of
 data <https://doi.org/10.48550/arXiv.2308.01382>
 
+The pseudo spread dimension is an efficient approximation of spread
+dimension <https://doi.org/10.48550/arXiv.2408.14590>
+
 ## Using spread_dimension
 
 To install, clone the repository, and use ```pip```
